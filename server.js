@@ -20,6 +20,7 @@ const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
 app.set("io", io);
 app.use(morgan('combined'));
+app.use(cors());
 
 io.on('connection', (socket) => {
   socket.emit("welcome", "Welcome to the Socket.IO server!");
