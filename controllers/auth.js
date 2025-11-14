@@ -166,8 +166,8 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: `Incorrect password. ${user.loginAttempt} attempt(s) left` })
     };
 
-    const accessToken = jwt.sign({ id: user._id, role: user.role }, secret, { expiresIn: '1day' });
-    const refreshToken = jwt.sign({ id: user._id, role: user.role }, secret, { expiresIn: '7days' });
+    const accessToken = jwt.sign({ id: user._id, role: user.role }, secret, { expiresIn: '7d' });
+    const refreshToken = jwt.sign({ id: user._id, role: user.role }, secret, { expiresIn: '14d' });
     Object.assign(user, { isLoggedIn: true, loginAttempt: 4 });
     await user.save();
 
@@ -193,8 +193,8 @@ exports.refreshToken = async (req, res) => {
     const payload = jwt.verify(token, process.env.secret);
     const user = await userModel.findById(payload.id);
     if (!user || user.refreshToken !== token) return res.status(403).json({ message: 'Invalid refresh token' });
-    const newAccessToken = jwt.sign({ id: user._id, role: user.role }, process.env.secret, { expiresIn: '15m' });
-    const newRefreshToken = jwt.sign({ id: user._id, role: user.role }, process.env.secret, { expiresIn: '7d' });
+    const newAccessToken = jwt.sign({ id: user._id, role: user.role }, process.env.secret, { expiresIn: '7d' });
+    const newRefreshToken = jwt.sign({ id: user._id, role: user.role }, process.env.secret, { expiresIn: '14d' });
     await user.save();
 
     res.cookie('refreshToken', newRefreshToken, {
