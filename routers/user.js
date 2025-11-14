@@ -7,7 +7,7 @@ const upload = require('../middleware/multer');
 
 /**
  * @swagger
- * /users:
+ * /api/v1/users:
  *   get:
  *     summary: Get all users
  *     tags:
@@ -79,7 +79,7 @@ router.get('/users', getUsers);
 
 /**
  * @swagger
- * /user/{id}:
+ * /api/v1/user/{id}:
  *   get:
  *     summary: Get a single user
  *     tags:
@@ -165,7 +165,7 @@ router.get('/user/:id', getUser);
 
 /**
  * @swagger
- * /change/password:
+ * /api/v1/change/password:
  *   post:
  *     summary: Change user password
  *     tags:
@@ -256,7 +256,7 @@ router.post('/change/password', authenticate, changePassword);
 
 /**
  * @swagger
- * /update/profile:
+ * /api/v1/update/profile:
  *   put:
  *     summary: Update user profile
  *     description: >

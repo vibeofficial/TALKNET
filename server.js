@@ -11,7 +11,6 @@ const morgan = require('morgan');
 const cors = require('cors');
 
 
-
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -25,7 +24,6 @@ app.use((error, req, res, next) => {
     return res.status(400).json({ message: error.message })
   }
 });
-
 
 const swaggerDefinition = {
   openapi: '3.0.0',
