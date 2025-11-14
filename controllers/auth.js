@@ -24,7 +24,7 @@ exports.register = async (req, res) => {
     });
 
     const token = jwt.sign({ id: user._id }, secret, { expiresIn: '10mins' });
-    const link = `${req.protocol}://${req.get('host')}/api/v1/verify/${token}`;
+    const link = `https://talknet-hazel.vercel.app/verify-email/${token}`;
     const mail_details = { email, subject: 'Email Verification', html: await verify(user.fullname.split(' ')[0], link) };
     await sendEmail(mail_details);
     res.status(201).json({ message: 'Account created successfully' })
@@ -46,7 +46,7 @@ exports.verify = async (req, res) => {
           if (!user) return res.status(404).json({ message: 'User not found' })
           if (user.isVerified === true) return res.status(400).json({ message: 'Account already verified', redirect: 'https://www.google.com' })
           const newToken = jwt.sign({ id: user._id }, secret, { expiresIn: '10mins' });
-          const link = `${req.protocol}://${req.get('host')}/api/v1/verify/${newToken}`;
+          const link = `https://talknet-hazel.vercel.app/verify-email/${newToken}`;
           const mail_details = { email: user.email, subject: 'RESEND: Email verification', html: await verify(user.fullname.split(' ')[0], link) };
           await sendEmail(mail_details);
           return res.status(201).json({ message: 'Link expired. A new link has been sent to email' })
@@ -57,7 +57,17 @@ exports.verify = async (req, res) => {
         if (user.isVerified === true) return res.status(400).json({ message: 'Account already verified', redirect: 'https://www.google.com' })
         user.isVerified = true;
         await user.save();
-        return res.status(200).json({ message: 'Verified successfully', redirect: 'https://www.google.com' })
+        const accessToken = jwt.sign({ id: user._id, role: user.role }, secret, { expiresIn: '7d' });
+
+
+        res.cookie('refreshToken', refreshToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
+          maxAge: 14 * 24 * 60 * 60 * 1000
+        });
+
+        return res.status(200).json({ message: 'Verified successfully', accessToken, refreshToken })
       }
     });
   } catch (error) {
@@ -175,7 +185,7 @@ exports.login = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000
+      maxAge: 14 * 24 * 60 * 60 * 1000
     });
 
     const data = { _id: user._id, fullname: user.fullname, username: user.username, phoneNumber: user.phoneNumber, profile: user.profile, role: user.role };
