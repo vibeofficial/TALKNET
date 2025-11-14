@@ -40,7 +40,7 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: 'https://eventiq-final-project.onrender.com/api/v1',
+      url: 'https://talknet-tr7a.onrender.com',
       description: 'production server',
     },
     {
