@@ -10,12 +10,13 @@ exports.sendMessage = async (req, res) => {
   if (!recieverId) return res.status(400).json({ message: "Reciever's id not provided" })
   const sender = await userModel.findById(req.user.id);
   if (!sender) return res.status(404).json({ message: 'Sender not found' });
-
+  const roomId = await generateRoomId(sender._id, recieverId);
+  
   const newMessage = await messageModel.create({
     senderId: sender._id,
     recieverId: recieverId,
     text,
-    roomId: await generateRoomId(sender._id, recieverId)
+    roomId: roomId
   })
 
   io.to(roomId).emit("message", newMessage);
