@@ -24,7 +24,7 @@ exports.register = async (req, res) => {
     });
 
     const token = jwt.sign({ id: user._id }, secret, { expiresIn: '10mins' });
-    const link = `${req.protocol}://${req.get('host')}/api/v1/verify/${token}`;
+    const link = `https://talknet-hazel.vercel.app/verify/${token}`;
     const mail_details = { email, subject: 'Email Verification', html: await verify(user.fullname.split(' ')[0], link) };
     await sendEmail(mail_details);
     res.status(201).json({ message: 'Account created successfully' })
@@ -82,7 +82,7 @@ exports.forgetPaswword = async (req, res) => {
     const user = await userModel.findOne({ email: email.toLowerCase() });
     if (!user) return res.status(404).json({ message: 'User not found' })
     const token = jwt.sign({ id: user._id }, secret, { expiresIn: '10mins' });
-    const link = `${req.protocol}://${req.get('host')}/api/v1/reset/${token}`;
+    const link = `https://talknet-hazel.vercel.app/verify/${token}`;
     const mail_details = { email, subject: 'Reset Password', html: await reset(user.fullname.split(' ')[0], link) };
     await sendEmail(mail_details);
     return res.status(200).json({ message: 'Reset link sent to email' })
