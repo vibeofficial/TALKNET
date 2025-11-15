@@ -57,7 +57,7 @@ exports.verify = async (req, res) => {
         if (user.isVerified === true) return res.status(400).json({ message: 'Account already verified', redirect: 'https://www.google.com' })
         user.isVerified = true;
         await user.save();
-        const accessToken = jwt.sign({ id: user._id, role: user.role }, secret, { expiresIn: '7d' });
+        const accessToken = jwt.sign({ id: user._id, role: user.role }, secret, { expiresIn: '1hr' });
         const refreshToken = jwt.sign({ id: user._id, role: user.role }, secret, { expiresIn: '14d' });
 
         res.cookie('refreshToken', refreshToken, {
@@ -67,7 +67,7 @@ exports.verify = async (req, res) => {
           maxAge: 14 * 24 * 60 * 60 * 1000
         });
 
-        return res.status(200).json({ message: 'Verified successfully', accessToken })
+        return res.status(200).json({ message: 'Verified successfully', id: user._id, accessToken })
       }
     });
   } catch (error) {
@@ -176,7 +176,7 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: `Incorrect password. ${user.loginAttempt} attempt(s) left` })
     };
 
-    const accessToken = jwt.sign({ id: user._id, role: user.role }, secret, { expiresIn: '7d' });
+    const accessToken = jwt.sign({ id: user._id, role: user.role }, secret, { expiresIn: '1hr' });
     const refreshToken = jwt.sign({ id: user._id, role: user.role }, secret, { expiresIn: '14d' });
     Object.assign(user, { isLoggedIn: true, loginAttempt: 4 });
     await user.save();
