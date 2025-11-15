@@ -24,7 +24,7 @@ exports.register = async (req, res) => {
     });
 
     const token = jwt.sign({ id: user._id }, secret, { expiresIn: '10mins' });
-    const link = `https://talknet-hazel.vercel.app/api/v1/verify/${token}`;
+    const link = `https://talknet-hazel.vercel.app/verify/${token}`;
     const mail_details = { email, subject: 'Email Verification', html: await verify(user.fullname.split(' ')[0], link) };
     await sendEmail(mail_details);
     res.status(201).json({ message: 'Account created successfully' })
@@ -46,7 +46,7 @@ exports.verify = async (req, res) => {
           if (!user) return res.status(404).json({ message: 'User not found' })
           if (user.isVerified === true) return res.status(400).json({ message: 'Account already verified', redirect: 'https://www.google.com' })
           const newToken = jwt.sign({ id: user._id }, secret, { expiresIn: '10mins' });
-          const link = `https://talknet-hazel.vercel.app/api/v1/verify/${newToken}`;
+          const link = `https://talknet-hazel.vercel.app/verify/${newToken}`;
           const mail_details = { email: user.email, subject: 'RESEND: Email verification', html: await verify(user.fullname.split(' ')[0], link) };
           await sendEmail(mail_details);
           return res.status(201).json({ message: 'Link expired. A new link has been sent to email' })
@@ -58,7 +58,7 @@ exports.verify = async (req, res) => {
         user.isVerified = true;
         await user.save();
         const accessToken = jwt.sign({ id: user._id, role: user.role }, secret, { expiresIn: '7d' });
-
+        const refreshToken = jwt.sign({ id: user._id, role: user.role }, secret, { expiresIn: '14d' });
 
         res.cookie('refreshToken', refreshToken, {
           httpOnly: true,
@@ -67,7 +67,7 @@ exports.verify = async (req, res) => {
           maxAge: 14 * 24 * 60 * 60 * 1000
         });
 
-        return res.status(200).json({ message: 'Verified successfully', accessToken, refreshToken })
+        return res.status(200).json({ message: 'Verified successfully', accessToken })
       }
     });
   } catch (error) {
