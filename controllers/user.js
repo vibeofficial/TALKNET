@@ -11,7 +11,7 @@ exports.getUsers = async (req, res) => {
     const users = await userModel.find({ role: 'user' }).select('-password -role -isVerified -isLoggedIn -loginAttempt -createdAt -updatedAt -__v');
     res.status(200).json({ message: 'All users', total: users.length, data: users });
   } catch (error) {
-    res.status(500).json({ message: 'Cannot get users at this moment', error: error.message })
+    res.status(500).json({ message: `Cannot get users at this moment: ${error.message}` })
   }
 };
 
@@ -22,7 +22,7 @@ exports.getUser = async (req, res) => {
     if (!user) return res.status(404).json({ message: 'User not found' })
     res.status(200).json({ message: 'Get user', data: user });
   } catch (error) {
-    res.status(500).json({ message: 'Cannot get user at this moment', error: error.message })
+    res.status(500).json({ message: `Cannot get user at this moment: ${error.message}` })
   }
 };
 
@@ -41,7 +41,7 @@ exports.changePassword = async (req, res) => {
     res.status(200).json({ message: 'Password changed successfully' })
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) return res.status(400).json({ message: 'Session timeout' });
-    res.status(500).json({ message: 'Cannot change password at this moment', error: error.message });
+    res.status(500).json({ message: `Cannot change password at this moment: ${error.message}` });
   }
 };
 
@@ -88,6 +88,6 @@ exports.updateProfile = async (req, res) => {
   } catch (error) {
     await handleFileUpload(file);
     if (error instanceof jwt.JsonWebTokenError) return res.status(400).json({ message: 'Session timeout' });
-    res.status(500).json({ message: 'Cannot update profile at this moment', error: error.message });
+    res.status(500).json({ message: `Cannot update profile at this moment: ${error.message}` });
   }
-}
+};

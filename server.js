@@ -6,6 +6,7 @@ const DB = process.env.DB_URI;
 const authRouter = require('./routers/auth');
 const userRouter = require('./routers/user');
 const messageRouter = require('./routers/message');
+const friendRouter = require('./routers/friend');
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const morgan = require('morgan');
@@ -48,6 +49,7 @@ io.on('connection', (socket) => {
 app.use('/api/v1', authRouter);
 app.use('/api/v1', userRouter);
 app.use('/api/v1', messageRouter);
+app.use('/api/v1', friendRouter);
 
 app.use((error, req, res, next) => {
   if (error) {
@@ -103,7 +105,7 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use('/', (req, res) => {
   res.send('Welcome to my page')
-})
+});
 
 mongoose.connect(DB).then(() => {
   console.log('Connected to DB');

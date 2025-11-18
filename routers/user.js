@@ -342,4 +342,5 @@ router.post('/change/password', authenticate, changePassword);
  */
 router.put('/update/profile', authenticate, upload.single('profile'), updateProfile);
 
+
 module.exports = router;

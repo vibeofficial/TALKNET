@@ -16,7 +16,7 @@ exports.register = async (req, res) => {
     if (existingUser) return res.status(400).json({ message: 'User with provided email or phone-number already exists' });
     if (password !== confirmPassword) return res.status(400).json({ message: 'Password do not match' });
 
-    const user = await userModel.create({
+    const user = new userModel({
       fullname: await format(fullname),
       email,
       password,
@@ -27,9 +27,10 @@ exports.register = async (req, res) => {
     const link = `https://talknet-hazel.vercel.app/verify/${token}`;
     const mail_details = { email, subject: 'Email Verification', html: await verify(user.fullname.split(' ')[0], link) };
     await sendEmail(mail_details);
+    await user.save();
     res.status(201).json({ message: 'Account created successfully' })
   } catch (error) {
-    res.status(500).json({ message: 'Cannot register user at this moment', error: error.message })
+    res.status(500).json({ message: `Cannot register user at this moment: ${error.message}` })
   }
 };
 
@@ -71,7 +72,7 @@ exports.verify = async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({ message: 'Cannot verify user at this moment', error: error.message })
+    res.status(500).json({ message: `Cannot verify user this moment: ${error.message}` })
   }
 };
 
@@ -82,12 +83,12 @@ exports.forgetPaswword = async (req, res) => {
     const user = await userModel.findOne({ email: email.toLowerCase() });
     if (!user) return res.status(404).json({ message: 'User not found' })
     const token = jwt.sign({ id: user._id }, secret, { expiresIn: '10mins' });
-    const link = `https://talknet-hazel.vercel.app/api/v1/verify/${token}`;
+    const link = `https://talknet-hazel.vercel.app/api/v1/reset-password/${token}`;
     const mail_details = { email, subject: 'Reset Password', html: await reset(user.fullname.split(' ')[0], link) };
     await sendEmail(mail_details);
     return res.status(200).json({ message: 'Reset link sent to email' })
   } catch (error) {
-    res.status(500).json({ message: 'Cannot forget user password at this moment', error: error.message })
+    res.status(500).json({ message: `Cannot forget user password at this moment: ${error.message}` })
   }
 };
 
@@ -121,7 +122,7 @@ exports.uploadProfile = async (req, res) => {
     res.status(200).json({ message: 'User profile has been updated successfully' });
   } catch (error) {
     await handleFileUpload(file)
-    res.status(500).json({ message: 'Cannot upload profile and username at this moment', error: error.message })
+    res.status(500).json({ message: `Cannot upload profile and username atthis moment: ${error.message}` })
   }
 };
 
@@ -153,7 +154,7 @@ exports.resetPassword = async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({ message: 'Cannot reset user password at this moment', error: error.message })
+    res.status(500).json({ message: `Cannot reset user password at this moment: ${error.message}` })
   }
 };
 
@@ -191,7 +192,7 @@ exports.login = async (req, res) => {
     const data = { _id: user._id, fullname: user.fullname, username: user.username, phoneNumber: user.phoneNumber, profile: user.profile, role: user.role };
     res.status(200).json({ message: 'Login successful', data, accessToken });
   } catch (error) {
-    res.status(500).json({ message: 'Cannot login at this moment', error: error.message });
+    res.status(500).json({ message: `Cannot login at this moment: ${error.message}` });
   }
 };
 
@@ -216,6 +217,6 @@ exports.refreshToken = async (req, res) => {
 
     res.status(200).json({ accessToken: newAccessToken });
   } catch (error) {
-    res.status(401).json({ message: 'Cannot refresh token at this moment', error: error.message });
+    res.status(401).json({ message: `Cannot refresh token at this moment: ${error.message}` });
   }
 };
