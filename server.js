@@ -70,7 +70,7 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: 'https://talknet-tr7a.onrender.com',
+      url: 'https://talknet-tr7a.onrender.com/api/v1',
       description: 'production server',
     },
     {
