@@ -9,7 +9,7 @@ const { handleFileUpload } = require('../helper/upload');
 exports.getUsers = async (req, res) => {
   try {
     const user = await userModel.findById(req.user.id);
-    const users = await userModel.find({ role: 'user', _id: { $ne: user._id } }).select('-password -role -isVerified -isLoggedIn -loginAttempt -createdAt -updatedAt -__v').populate('friendsId');
+    const users = await userModel.find({ role: 'user', _id: { $ne: user._id } }).select('-password -role -isVerified -isLoggedIn -loginAttempt -createdAt -updatedAt -__v').populate('friendsId', 'status');
 
     if (!user)
       return res.status(403).json({ message: 'Please login to continue' })
