@@ -1,7 +1,8 @@
-const { Schema, model } = require('mongoose');
+const { Schema, model, default: mongoose } = require('mongoose');
 const bcrypt = require('bcrypt');
 
 const userSchema = new Schema({
+  friendsId: { type: mongoose.Schema.Types.ObjectId },
   fullname: { type: String, required: true, trim: true, lowercase: true },
   username: { type: String, trim: true, lowercase: true, default: '' },
   email: { type: String, required: true, lowercase: true, trim: true, unique: true },
@@ -11,7 +12,7 @@ const userSchema = new Schema({
   role: { type: String, lowercase: true, trim: true, enum: ['user', 'admin'], default: 'user' },
   isVerified: { type: Boolean, default: false },
   isLoggedIn: { type: Boolean, default: false },
-  loginAttempt: { type: Number, default: 4 }
+  loginAttempt: { type: Number, default: 4 },
 }, { timestamps: true });
 
 userSchema.pre('save', async function (next) {

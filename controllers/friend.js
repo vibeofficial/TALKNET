@@ -19,6 +19,8 @@ exports.sendRequest = async (req, res) => {
   try {
     const user = await userModel.findById(req.user.id);
     const friend = await userModel.findById(req.params.id);
+    const friendRequest = await frindModel.findOne({ $and: [{ userId: user._id }, { friendId: friend._id }, { status: 'pending' }] });
+    const friends = await frindModel.findOne({ $and: [{ userId: user._id }, { friendId: friend._id }, { status: 'true' }] });
 
     if (!user)
       return res.status(404).json({ message: 'Account is logged out' });
@@ -26,7 +28,9 @@ exports.sendRequest = async (req, res) => {
     if (!friend)
       return res.status(404).json({ message: 'Friend not found' });
 
-    const friends = await frindModel.findOne({ $and: [{ userId: user._id }, { friendId: friend._id }] });
+    if (friendRequest)
+      return res.status(400).json({ message: 'Friend request sent already' });
+
     if (friends)
       return res.status(400).json({ message: 'Friend added already' });
 
@@ -35,7 +39,10 @@ exports.sendRequest = async (req, res) => {
       friendId: friend._id
     });
 
+    user.friendsId = request._id;
+    await user.save();
     await request.save();
+
     res.status(200).json({
       message: 'Friend request sent succssfully', request, data: {
         fullname: friend.fullname,
@@ -53,7 +60,7 @@ exports.sendRequest = async (req, res) => {
 exports.getAllRequests = async (req, res) => {
   try {
     const user = await userModel.findById(req.user.id);
-    const requests = await friendModel.find({ userId: user._id, status: false })
+    const requests = await friendModel.find({ userId: user._id, status: 'pending' })
       .populate('friendId', 'fullname username email profile')
       .sort({ createdAt: -1 });
 
@@ -82,7 +89,7 @@ exports.acceptRequest = async (req, res) => {
     if (request.status === true)
       return res.status(404).json({ message: 'Friend request accepted already' });
 
-    request.status = true;
+    request.status = 'true';
     await request.save();
     res.status(200).json({ message: 'Friend request accepted successfully' })
   } catch (error) {

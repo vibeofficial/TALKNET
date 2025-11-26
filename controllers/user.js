@@ -8,7 +8,7 @@ const { handleFileUpload } = require('../helper/upload');
 
 exports.getUsers = async (req, res) => {
   try {
-    const users = await userModel.find({ role: 'user' }).select('-password -role -isVerified -isLoggedIn -loginAttempt -createdAt -updatedAt -__v');
+    const users = await userModel.find({ role: 'user' }).select('-password -role -isVerified -isLoggedIn -loginAttempt -createdAt -updatedAt -__v').populate('friendsId');
     res.status(200).json({ message: 'All users', total: users.length, data: users });
   } catch (error) {
     res.status(500).json({ message: `Cannot get users at this moment: ${error.message}` })
