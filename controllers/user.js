@@ -11,7 +11,7 @@ exports.getUsers = async (req, res) => {
     const user = await userModel.findById(req.user.id);
     const users = await userModel.find({ role: 'user', _id: { $ne: user._id } }).select('-password -role -isVerified -isLoggedIn -loginAttempt -createdAt -updatedAt -__v').populate('friendsId');
 
-    if (user)
+    if (!user)
       return res.status(403).json({ message: 'Please login to continue' })
 
     res.status(200).json({ message: 'All users', total: users.length, data: users });
