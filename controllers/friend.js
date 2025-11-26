@@ -39,8 +39,10 @@ exports.sendRequest = async (req, res) => {
       friendId: friend._id
     });
 
+    friend.friendsId = request._id
     user.friendsId = request._id;
     await user.save();
+    await friend.save();
     await request.save();
 
     res.status(200).json({
