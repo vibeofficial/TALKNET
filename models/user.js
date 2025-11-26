@@ -2,7 +2,7 @@ const { Schema, model, default: mongoose } = require('mongoose');
 const bcrypt = require('bcrypt');
 
 const userSchema = new Schema({
-  friendsId: { type: mongoose.Schema.Types.ObjectId },
+  friendsId: { type: mongoose.Schema.Types.ObjectId, ref: 'friends' },
   fullname: { type: String, required: true, trim: true, lowercase: true },
   username: { type: String, trim: true, lowercase: true, default: '' },
   email: { type: String, required: true, lowercase: true, trim: true, unique: true },
