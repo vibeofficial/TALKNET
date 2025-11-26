@@ -74,7 +74,7 @@ const upload = require('../middleware/multer');
  *                   type: string
  *                   example: An unexpected error occurred
  */
-router.get('/users', getUsers);
+router.get('/users', authenticate, getUsers);
 
 
 /**
