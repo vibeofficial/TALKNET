@@ -69,7 +69,7 @@ exports.getAllRequests = async (req, res) => {
     if (!user)
       return res.status(404).json({ message: 'Account is logged out' });
 
-    res.status(200).json({ message: 'All friend request', data: requests });
+    res.status(200).json({ message: 'All friend request', total: requests.length, data: requests });
   } catch (error) {
     res.status(500).json({ message: `Cannot get all friend requests at this moment: ${error.message}` });
   }
